@@ -1,0 +1,15 @@
+com.mhealthatlas.apps
+com.mhealthatlas.apps.command
+com.mhealthatlas.apps.config
+com.mhealthatlas.apps.config.kafka
+com.mhealthatlas.apps.config.web
+com.mhealthatlas.apps.config.web.filter
+com.mhealthatlas.apps.controller
+com.mhealthatlas.apps.dto
+com.mhealthatlas.apps.helper
+com.mhealthatlas.apps.model
+com.mhealthatlas.apps.properties
+com.mhealthatlas.apps.query
+com.mhealthatlas.apps.receiver
+com.mhealthatlas.apps.repository
+com.mhealthatlas.apps.search

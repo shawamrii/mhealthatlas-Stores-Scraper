@@ -1,0 +1,26 @@
+cluster.name: "mediqsoft-cluster"
+network.host: 0.0.0.0
+
+######## Start OpenDistro for Elasticsearch Security Demo Configuration ########
+# WARNING: revise all the lines below before you go into production
+opendistro_security.ssl.transport.pemcert_filepath: es-admin.pem
+opendistro_security.ssl.transport.pemkey_filepath: es-admin-key.pem
+opendistro_security.ssl.transport.pemtrustedcas_filepath: mediqsoft-root-ca.pem
+opendistro_security.ssl.transport.enforce_hostname_verification: true
+opendistro_security.ssl.transport.resolve_hostname: true
+opendistro_security.ssl.http.enabled: true
+opendistro_security.ssl.http.pemcert_filepath: es-admin.pem
+opendistro_security.ssl.http.pemkey_filepath: es-admin-key.pem
+opendistro_security.ssl.http.pemtrustedcas_filepath: mediqsoft-root-ca.pem
+opendistro_security.allow_default_init_securityindex: true
+opendistro_security.authcz.admin_dn:
+  - CN=elasticsearch,OU=MHealthAtlas,O=MediQSoft,L=Berlin,ST=Berlin,C=DE
+opendistro_security.audit.type: internal_elasticsearch
+opendistro_security.enable_snapshot_restore_privilege: true
+opendistro_security.check_snapshot_restore_write_privileges: true
+opendistro_security.restapi.roles_enabled: ["all_access", "security_rest_api_access"]
+opendistro_security.system_indices.enabled: true
+opendistro_security.system_indices.indices: [".opendistro-alerting-config", ".opendistro-alerting-alert*"]
+cluster.routing.allocation.disk.threshold_enabled: false
+node.max_local_storage_nodes: 3
+######## End OpenDistro for Elasticsearch Security Demo Configuration ########

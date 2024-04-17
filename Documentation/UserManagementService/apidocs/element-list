@@ -1,0 +1,15 @@
+com.mhealthatlas.usermanagement
+com.mhealthatlas.usermanagement.command
+com.mhealthatlas.usermanagement.config
+com.mhealthatlas.usermanagement.config.kafka
+com.mhealthatlas.usermanagement.config.web
+com.mhealthatlas.usermanagement.config.web.filter
+com.mhealthatlas.usermanagement.controller
+com.mhealthatlas.usermanagement.dto
+com.mhealthatlas.usermanagement.helper
+com.mhealthatlas.usermanagement.model
+com.mhealthatlas.usermanagement.properties
+com.mhealthatlas.usermanagement.query
+com.mhealthatlas.usermanagement.repository
+com.mhealthatlas.usermanagement.reveiver
+com.mhealthatlas.usermanagement.services

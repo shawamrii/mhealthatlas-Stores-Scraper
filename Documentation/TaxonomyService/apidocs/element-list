@@ -1,0 +1,14 @@
+com.mhealthatlas.taxonomy
+com.mhealthatlas.taxonomy.command
+com.mhealthatlas.taxonomy.config
+com.mhealthatlas.taxonomy.config.kafka
+com.mhealthatlas.taxonomy.config.web
+com.mhealthatlas.taxonomy.config.web.filter
+com.mhealthatlas.taxonomy.controller
+com.mhealthatlas.taxonomy.converter
+com.mhealthatlas.taxonomy.dto
+com.mhealthatlas.taxonomy.model
+com.mhealthatlas.taxonomy.properties
+com.mhealthatlas.taxonomy.query
+com.mhealthatlas.taxonomy.receiver
+com.mhealthatlas.taxonomy.repository

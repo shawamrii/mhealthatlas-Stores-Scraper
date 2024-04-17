@@ -1,0 +1,14 @@
+com.mhealthatlas.rating
+com.mhealthatlas.rating.command
+com.mhealthatlas.rating.config
+com.mhealthatlas.rating.config.kafka
+com.mhealthatlas.rating.config.web
+com.mhealthatlas.rating.config.web.filter
+com.mhealthatlas.rating.controller
+com.mhealthatlas.rating.dto
+com.mhealthatlas.rating.helper
+com.mhealthatlas.rating.model
+com.mhealthatlas.rating.properties
+com.mhealthatlas.rating.query
+com.mhealthatlas.rating.receiver
+com.mhealthatlas.rating.repository

@@ -1,0 +1,62 @@
+#application name
+spring.application.name: "mhealthatlas-gateway"
+logging:
+  level:
+    '[reactor.netty]': INFO
+    '[org.springframework.cloud.gateway]': DEBUG
+spring.zipkin.baseUrl: http://jaeger:9411/
+spring:
+  sleuth:
+    opentracing:
+      enabled: true
+    traceId128: true
+    sampler:
+      probability: 0.01
+
+#server settings
+server:
+  port: "${APP_PORT}"
+  servlet.context-path: "${APP_ROOT_PATH}"
+
+#ssl settings
+server.ssl:
+    enabled: true
+    key-store: classpath:${SSL_KEYSTORE_PATH}
+    key-store-password: ${SSL_KEYSTORE_PASSWORD}
+tls:
+  truststore: ${SSL_TRUSTSTORE_PATH}
+  truststore-password: ${SSL_TRUSTSTORE_PASSWORD}
+
+#oauth2 resource server settings
+spring.security.oauth2.resourceserver.jwt.issuer-uri: ${KEYCLOAK_ISSUER_URL}
+
+#spring discovery
+spring.cloud.gateway.discovery.locator.enabled: true
+
+#spring cloud consul
+spring.cloud:
+  consul:
+    host: ${CONSUL_HOST}
+    port: ${CONSUL_PORT}
+    discovery:
+      register: false
+      register-health-check: false
+      scheme: https
+      metadata:
+        secure: true
+  gateway:
+    httpclient:
+      ssl:
+        use-insecure-trust-manager: true
+
+#cors
+cors:
+  allowed-origins:
+    - https://mhealthatlas:5556
+  allowed-headers:
+    - authorization
+    - content-type
+  allowed-methods:
+    - GET
+    - POST
+    - DELETE

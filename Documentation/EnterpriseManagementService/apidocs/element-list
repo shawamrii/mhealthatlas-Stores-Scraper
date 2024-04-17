@@ -1,0 +1,15 @@
+com.mhealthatlas.enterprisemanagement
+com.mhealthatlas.enterprisemanagement.command
+com.mhealthatlas.enterprisemanagement.config
+com.mhealthatlas.enterprisemanagement.config.kafka
+com.mhealthatlas.enterprisemanagement.config.web
+com.mhealthatlas.enterprisemanagement.config.web.filter
+com.mhealthatlas.enterprisemanagement.controller
+com.mhealthatlas.enterprisemanagement.dto
+com.mhealthatlas.enterprisemanagement.helper
+com.mhealthatlas.enterprisemanagement.model
+com.mhealthatlas.enterprisemanagement.properties
+com.mhealthatlas.enterprisemanagement.query
+com.mhealthatlas.enterprisemanagement.repository
+com.mhealthatlas.enterprisemanagement.reveiver
+com.mhealthatlas.enterprisemanagement.services

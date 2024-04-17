@@ -1,0 +1,267 @@
+version: '3'
+services:
+# Store Apps Service
+  store-apps-service:
+    build: ./StoreApps/
+    container_name: store-apps-service
+    env_file:
+      - ./StoreApps/.env
+    networks:
+      - mhealthatlas-backend-network
+    depends_on:
+      - postgres-store-apps-db
+      - kafka1
+      - keycloak-mhealthatlas
+
+  postgres-store-apps-db:
+    image: postgres:12.3-alpine
+    container_name: store-apps-db
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_STORE_APPS_DB_PW}
+      - POSTGRES_DB=StoreApps
+    ports:
+      - "5500:5432"
+    volumes:
+      - ./Database/scripts/initStoreAppsDB.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./Database/scripts/initOutboxSettings.sh:/docker-entrypoint-initdb.d/init.sh
+    networks:
+      - mhealthatlas-backend-network
+
+
+
+# Apps Service
+  mhealthatlas-apps-service:
+    build: ./apps/
+    container_name: mhealthatlas-apps-service
+    env_file:
+      - ./apps/.env
+    volumes:
+      - ./ssl/app/truststore.jks:/ssl/truststore.jks
+      - ./ssl/app/keystore.jks:/ssl/keystore.jks
+    networks:
+      - mhealthatlas-backend-network
+    depends_on:
+      - postgres-mhealthatlas-apps-db
+      - kafka1
+      - keycloak-mhealthatlas
+
+  postgres-mhealthatlas-apps-db:
+    image: postgres:12.3-alpine
+    container_name: mhealthatlas-apps-db
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_MHEALTHATLAS_APPS_DB_PW}
+      - POSTGRES_DB=mhealthatlasApps
+    ports:
+      - "5501:5432"
+    volumes:
+      - ./Database/scripts/initMHealthAtlasAppsDB.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./Database/scripts/initOutboxSettings.sh:/docker-entrypoint-initdb.d/init.sh
+    networks:
+      - mhealthatlas-backend-network
+
+#Enterprise Apps Service
+  enterprise-apps-service:
+    build: ./enterprise-apps/
+    container_name: enterprise-apps-service
+    env_file:
+      - ./enterprise-apps/.env
+    volumes:
+      - ./ssl/enterprise-app/truststore.jks:/ssl/truststore.jks
+      - ./ssl/enterprise-app/keystore.jks:/ssl/keystore.jks
+    networks:
+      - mhealthatlas-backend-network
+    depends_on:
+      - postgres-mhealthatlas-enterprise-apps-db
+      - kafka1
+      - keycloak-mhealthatlas
+
+  postgres-mhealthatlas-enterprise-apps-db:
+    image: postgres:12.3-alpine
+    container_name: mhealthatlas-enterprise-apps-db
+    ports:
+      - "5509:5432"
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_MHEALTHATLAS_ENTERPRISE_APPS_DB_PW}
+      - POSTGRES_DB=mhealthatlasEnterpriseApps
+    volumes:
+      - ./Database/scripts/initMHealthAtlasEnterpriseAppsDB.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./Database/scripts/initOutboxSettings.sh:/docker-entrypoint-initdb.d/init.sh
+    networks:
+      - mhealthatlas-backend-network
+
+# Gateway
+  mhealthatlas-gateway:
+    build: ./gateway/
+    hostname: mhealthatlas-gateway
+    container_name: mhealthatlas-gateway
+    env_file:
+      - ./gateway/.env
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./ssl/gateway/truststore.jks:/ssl/truststore.jks
+      - ./ssl/gateway/keystore.jks:/ssl/keystore.jks
+    networks:
+      - mhealthatlas-backend-network
+    depends_on:
+      - keycloak-mhealthatlas
+
+#Identity Provider
+  keycloak-proxy:
+    build: ./nginx/
+    container_name: keycloak-proxy
+    env_file:
+      - ./KeycloakProxy/.env
+    ports:
+      - "5506:5506"
+    networks:
+      - mhealthatlas-backend-network
+    volumes:
+      - ./KeycloakProxy/keycloak-proxy.conf.template:/etc/nginx/templates/keycloack-proxy.conf.template
+      - ./ssl/keycloak_proxy/keycloak_proxy.pem:/etc/nginx/certs/keycloakProxy.crt
+      - ./ssl/keycloak_proxy/keycloak_proxy-key.pem:/etc/nginx/certs/keycloakProxy.key
+    depends_on:
+      - keycloak-mhealthatlas
+
+  keycloak-mhealthatlas:
+    build: ./Keycloak/
+    container_name: mhealthatlas-keycloak
+    environment:
+      - DB_VENDOR=postgres
+      - DB_ADDR=keycloak-db
+      - DB_USER=${POSTGRES_MHEALTHATLAS_KEYCLOAK_DB_USER}
+      - DB_PASSWORD=${POSTGRES_MHEALTHATLAS_KEYCLOAK_DB_PW}
+      - KEYCLOAK_USER=${KEYCLOAK_MHEALTHATLAS_USERNAME}
+      - KEYCLOAK_PASSWORD=${KEYCLOAK_MHEALTHATLAS_PASSWORD}
+      - KEYCLOAK_DEFAULT_THEME=custom
+      - PROXY_ADDRESS_FORWARDING=true
+      - X509_CA_BUNDLE=/etc/x509/https/cacert.crt
+      - KAFKA_SERVER=${KAFKA_SERVER}
+    command:
+      - "-Dkeycloak.migration.action=import"
+      - "-Dkeycloak.migration.provider=singleFile"
+      - "-Dkeycloak.migration.file=/tmp/Realm.json"
+      - "-Dkeycloak.migration.strategy=OVERWRITE_EXISTING"
+    ports:
+      - "8443:8443"
+    networks:
+      - mhealthatlas-backend-network
+    volumes:
+        - ./Keycloak/MHealthAtlas-realm.json:/tmp/Realm.json
+        - ./Keycloak/themes/Custom/:/opt/jboss/keycloak/themes/custom
+        - ./ssl/keycloak/keycloak.pem:/etc/x509/https/tls.crt
+        - ./ssl/keycloak/keycloak-key.pem:/etc/x509/https/tls.key
+        - ./ssl/cacert.pem:/etc/x509/https/cacert.crt
+    depends_on:
+      - postgres-keycloak-db
+
+  postgres-keycloak-db:
+    image: postgres:12.3-alpine
+    container_name: keycloak-db
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=${POSTGRES_MHEALTHATLAS_KEYCLOAK_DB_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_MHEALTHATLAS_KEYCLOAK_DB_PW}
+    networks:
+      - mhealthatlas-backend-network
+
+# Service Discovery (Consul)
+  consul1:
+    image: "consul"
+    container_name: "consul1"
+    environment:
+      - CONSUL_BIND_INTERFACE=eth0
+    ports:
+      - "8500:8500"
+    command: "agent -server -ui -client=0.0.0.0 -bind='{{ GetInterfaceIP \"eth0\" }}' -bootstrap-expect=1"
+    networks:
+      - mhealthatlas-backend-network
+    volumes:
+      - ./ServiceDiscovery/consul-server-config-0.json:/consul/config/consul-config.json
+      - ./ssl/cacert.pem:/consul/config/ssl/consul-agent-ca.pem
+      - ./ssl/consul1/consul1.pem:/consul/config/ssl/dc1-server-consul-0.pem
+      - ./ssl/consul1/consul1-key.pem:/consul/config/ssl/dc1-server-consul-0-key.pem
+
+# Message Broker (Kafka)
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - '2181:2181'
+    environment:
+      - ZOO_SERVER_ID=1
+      - ZOO_PORT_NUMBER=2181
+      - ZOO_SERVERS=server.1=zookeeper:2888:3888
+      - ZOO_4LW_COMMANDS_WHITELIST=dump, srvr, mntr
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - mhealthatlas-backend-network
+
+  kafka1:
+    image: 'bitnami/kafka:latest'
+    hostname: kafka1
+    container_name: kafka1
+    ports:
+      - '9092:9092'
+    environment:
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka1:19092,EXTERNAL://kafka1:9092
+      - KAFKA_CFG_LISTENERS=INTERNAL://kafka1:19092,EXTERNAL://kafka1:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_BROKER_ID=1
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
+    networks:
+      - mhealthatlas-backend-network
+
+# Database Monitoring Service
+  app-debezium-connect:
+    build: ./DebeziumTransformer/
+    container_name: app-debezium-connect
+    hostname: app-debezium-connect
+    ports:
+      - '8083:8083'
+    environment:
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: app-debezium_connect_config
+      OFFSET_STORAGE_TOPIC: app-debezium_connect_offsets
+      STATUS_STORAGE_TOPIC: app-debezium_connect_status
+      BOOTSTRAP_SERVERS: kafka1:9092
+      ZOOKEEPER_CONNECTION: zookeeper:2181
+    networks:
+      - mhealthatlas-backend-network
+    depends_on:
+      - kafka1
+      - postgres-mhealthatlas-apps-db
+
+# Setup Container
+  kafka-setup:
+    image: confluentinc/cp-kafka
+    hostname: kafka-setup
+    container_name: kafka-setup
+    command: "bash -c 'echo Waiting for Kafka to be ready... && \
+                        cub kafka-ready -b kafka1:9092 1 20 && \
+                        kafka-topics --create --if-not-exists --zookeeper zookeeper:2181 --partitions 1 --replication-factor 1 --topic android-application && \
+                        kafka-topics --create --if-not-exists --zookeeper zookeeper:2181 --partitions 1 --replication-factor 1 --topic ios-application && \
+                        kafka-topics --create --if-not-exists --zookeeper zookeeper:2181 --partitions 1 --replication-factor 1 --topic private-application && \
+                        echo Waiting 30 seconds for Connect to be ready... && \
+                        sleep 30 && \
+                        curl -i -X POST -H Accept:application/json -H Content-Type:application/json http://app-debezium-connect:8083/connectors/ -d @/opt/docker/connectors/connector_app.config'"
+    environment:
+      # The following settings are listed here only to satisfy the image's requirements.
+      # We override the image's `command` anyways, hence this container will not start a broker.
+      KAFKA_BROKER_ID: ignored
+      KAFKA_ZOOKEEPER_CONNECT: ignored
+    volumes:
+      - ./DebeziumTransformer/connector_app.config:/opt/docker/connectors/connector_app.config
+    depends_on:
+      - kafka1
+    networks:
+      - mhealthatlas-backend-network
+
+networks:
+  mhealthatlas-backend-network:
+    driver: bridge

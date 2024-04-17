@@ -1,0 +1,17 @@
+# Default Kibana configuration for docker target
+server.name: kibana
+server.host: "0"
+
+# http encryption
+server.ssl.enabled: true
+server.ssl.certificate: "/usr/share/kibana/config/kibana.pem"
+server.ssl.key: "/usr/share/kibana/config/kibana-key.pem"
+
+# internal encryption
+elasticsearch.hosts: ["https://elasticsearch:9200"]
+elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/mediqsoft-root-ca.pem"]
+elasticsearch.ssl.verificationMode: full
+
+# Configure the Kibana internal server user
+elasticsearch.username: "kibanaserver"
+elasticsearch.password: "MHealthAtlasESKibanaserver"

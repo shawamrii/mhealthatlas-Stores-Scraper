@@ -1,0 +1,38 @@
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      labels.dedot: true
+      templates:
+        - condition:
+            contains:
+              container.labels.collect_logs_with_filebeat: "true"
+          config:
+            - type: container
+              format: docker
+              paths:
+                - "/var/lib/docker/containers/${data.docker.container.id}/*.log"
+              processors:
+                - decode_json_fields:
+                    when.equals:
+                      docker.container.labels.decode_log_event_to_json_object: "true"
+                    fields: ["message"]
+                    target: ""
+                    overwrite_keys: true
+        - condition:
+            contains:
+              container.labels.collect_postgresql_logs_with_filebeat: "true"
+          config:
+            - module: postgresql
+              log:
+                input: 
+                  type: container
+                  paths:
+                    - "/var/lib/docker/containers/${data.docker.container.id}/*.log"
+
+output.logstash:
+  hosts: "${LOGSTASH_HOST}"
+  ssl.certificate_authorities: ["/usr/share/filebeat/config/mediqsoft-root-ca.pem"]
+  ssl.certificate: "/usr/share/filebeat/config/filebeat.pem"
+  ssl.key: "/usr/share/filebeat/config/filebeat-key.pem"
+
+logging.metrics.enabled: false

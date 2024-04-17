@@ -1,0 +1,51 @@
+_meta:
+  type: "internalusers"
+  config_version: 2
+
+# Define your internal users here
+
+## Demo users
+
+admin:
+  hash: "$2y$12$ryviF5Kxf4bxpWoqam72Ae4rSn2/6yNfNpWl.sKqt7OU9.oFAltxS"
+  reserved: true
+  backend_roles:
+  - "admin"
+  description: "Demo admin user"
+
+kibanaserver:
+  hash: "$2y$12$PRPRIMlGHo/xdRoSyNn8tOTzhhlniMWuoslJYr0R8rLgnicB9OFmm"
+  reserved: true
+  description: "Demo kibanaserver user"
+
+kibanaro:
+  hash: "$2y$12$6y2PHBOAu/k5bcaV5hZUveNIP2DPwYXc/bSu8TLUU8jRLz/SZHw5e"
+  reserved: false
+  backend_roles:
+  - "kibanauser"
+  - "readall"
+  attributes:
+    attribute1: "value1"
+    attribute2: "value2"
+    attribute3: "value3"
+  description: "Demo kibanaro user"
+
+logstash:
+  hash: "$2y$12$F7bQQLi34nnTZ.TRbB0BduNkas0m9PTTymrx6b/oK2pxWUuAZmPpy"
+  reserved: false
+  backend_roles:
+  - "logstash"
+  description: "Demo logstash user"
+
+readall:
+  hash: "$2y$12$eBEhOqOrvuy3bkE9pNwjEO0JDXqYosPm.7IYldt3AJmjp9OH0f/N."
+  reserved: false
+  backend_roles:
+  - "readall"
+  description: "Demo readall user"
+
+snapshotrestore:
+  hash: "$2y$12$YbO8z8N.MC8YxtJBPWKbYec8Korhcsin6DCzEyjIAG8rcIXe5/Rui"
+  reserved: false
+  backend_roles:
+  - "snapshotrestore"

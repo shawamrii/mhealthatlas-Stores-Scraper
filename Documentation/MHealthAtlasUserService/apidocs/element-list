@@ -1,0 +1,13 @@
+com.mhealthatlas.mhealthatlasusers
+com.mhealthatlas.mhealthatlasusers.command
+com.mhealthatlas.mhealthatlasusers.config
+com.mhealthatlas.mhealthatlasusers.config.kafka
+com.mhealthatlas.mhealthatlasusers.config.web
+com.mhealthatlas.mhealthatlasusers.config.web.filter
+com.mhealthatlas.mhealthatlasusers.controller
+com.mhealthatlas.mhealthatlasusers.dto
+com.mhealthatlas.mhealthatlasusers.model
+com.mhealthatlas.mhealthatlasusers.properties
+com.mhealthatlas.mhealthatlasusers.query
+com.mhealthatlas.mhealthatlasusers.receiver
+com.mhealthatlas.mhealthatlasusers.repository
